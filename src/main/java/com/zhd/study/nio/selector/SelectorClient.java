@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Random;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -34,7 +34,6 @@ public class SelectorClient {
 
     private static class Client extends Thread {
         private String name;
-        private Random random = new Random(47);
 
         public Client(String name) {
             this.name = name;
@@ -84,30 +83,49 @@ public class SelectorClient {
                 SocketChannel schannel = SocketChannel.open();
                 schannel.configureBlocking(false);
                 schannel.connect(new InetSocketAddress(8080));
-                while (!schannel.finishConnect()) {
-                    TimeUnit.MILLISECONDS.sleep(100);//睡眠0.1秒
-                }
-                //完成连接了
-                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                Selector selector = Selector.open();
+                schannel.register(selector, SelectionKey.OP_CONNECT);
 
-                for (int i = 0; i < 3; i++) {
-                    TimeUnit.MILLISECONDS.sleep(100 * random.nextInt(10));
-                    buffer.clear();
-                    String msg = "我是" + name + "; 信号id：" + i;
-                    buffer.put(msg.getBytes("utf-8"));
-                    buffer.flip();
-                    while (buffer.hasRemaining()) {
-                        schannel.write(buffer);
+                while (true) {
+                    int count = selector.select();
+                    if (count == 0) {
+                        continue;
                     }
-                    buffer.clear();
+                    Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+                    while (iterator.hasNext()) {
+                        SelectionKey key = iterator.next();
+                        iterator.remove();
+                        handleInput(selector, key);
+                    }
                 }
-
-                schannel.close();//关闭通道
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        private void handleInput(Selector selector, SelectionKey key) throws IOException, InterruptedException {
+            if (!key.isValid()) {
+                return;
+            }
+            SocketChannel sc = (SocketChannel) key.channel();
+            if (key.isConnectable()) {
+                if (sc.finishConnect()) {
+                    //在通道上注册感兴趣事件为读
+                    sc.register(selector, SelectionKey.OP_READ);
+                    writeToChannel(sc, "我是" + name);
+                } else {
+                    //连接失败，退出
+                    System.exit(1);
+                }
+            }
+            if (key.isReadable()) {
+                String msg = readFromChannel(sc);
+                System.out.println("服务端返回：" + msg);
+                sc.close();
+            }
+        }
+
     }
 
 }

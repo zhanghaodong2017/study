@@ -16,7 +16,6 @@ import java.util.Iterator;
  */
 public class SelectorServer {
 
-    private static ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     public static void main(String[] args) {
         try {
@@ -52,7 +51,8 @@ public class SelectorServer {
                         SocketChannel channel = (SocketChannel) key.channel();
                         String msg = readFromChannel(channel);
                         System.out.println("客户端请求：" + msg);
-
+                        writeToChannel(channel, "我收到你的消息了：" + msg);
+                        channel.close();
                     }
                 }
 
@@ -66,7 +66,7 @@ public class SelectorServer {
 
     private static void writeToChannel(SocketChannel channel, String content) {
         try {
-            buffer.clear();
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
             buffer.put(content.getBytes("utf-8"));
             buffer.flip();
             while (buffer.hasRemaining()) {
@@ -80,7 +80,7 @@ public class SelectorServer {
 
     private static String readFromChannel(SocketChannel channel) {
         try {
-            buffer.clear();
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
             int count;
             StringBuffer stringBuffer = new StringBuffer();
             while ((count = channel.read(buffer)) > 0) {
@@ -89,9 +89,6 @@ public class SelectorServer {
                 buffer.get(bytes);
                 stringBuffer.append(new String(bytes, "utf-8"));
                 buffer.clear();
-            }
-            if (count < 0) {
-                channel.close();
             }
             return stringBuffer.toString();
         } catch (IOException e) {
