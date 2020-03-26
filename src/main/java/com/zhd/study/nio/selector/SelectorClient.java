@@ -1,11 +1,16 @@
 package com.zhd.study.nio.selector;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Random;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: zhanghaodong
@@ -16,7 +21,7 @@ public class SelectorClient {
 
 
     public static void main(String[] args) {
-        ExecutorService executorService = new ThreadPoolExecutor(1, 8, 15, TimeUnit.MINUTES, new ArrayBlockingQueue<Runnable>(2048), new NamedThreadFactory("LOGGER"));
+        ExecutorService executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 
         executorService.submit(new Client("client1"));
         executorService.submit(new Client("client2"));
@@ -26,37 +31,51 @@ public class SelectorClient {
         executorService.shutdown();
     }
 
-    private static class NamedThreadFactory implements ThreadFactory {
-        private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
-        private final ThreadGroup group;
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix;
-
-        private NamedThreadFactory(String name) {
-            SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-            namePrefix = "pool-" + POOL_NUMBER.getAndIncrement() + "-" + name + "-thread-";
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
-            if (t.isDaemon()) {
-                t.setDaemon(false);
-            }
-            if (t.getPriority() != Thread.NORM_PRIORITY) {
-                t.setPriority(Thread.NORM_PRIORITY);
-            }
-            return t;
-        }
-
-    }
 
     private static class Client extends Thread {
         private String name;
         private Random random = new Random(47);
+
         public Client(String name) {
             this.name = name;
+        }
+
+        private static void writeToChannel(SocketChannel channel, String content) {
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            try {
+                buffer.clear();
+                buffer.put(content.getBytes("utf-8"));
+                buffer.flip();
+                while (buffer.hasRemaining()) {
+                    channel.write(buffer);
+                }
+                buffer.clear();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private static String readFromChannel(SocketChannel channel) {
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            try {
+                int count;
+                StringBuffer stringBuffer = new StringBuffer();
+                while ((count = channel.read(buffer)) > 0) {
+                    buffer.flip();
+                    byte[] bytes = new byte[buffer.remaining()];
+                    buffer.get(bytes);
+                    stringBuffer.append(new String(bytes, "utf-8"));
+                    buffer.clear();
+                }
+                if (count < 0) {
+                    channel.close();
+                }
+                return stringBuffer.toString();
+            } catch (IOException e) {
+                System.out.println("错误了：" + e.getMessage());
+                e.printStackTrace();
+            }
+            return null;
         }
 
         @Override

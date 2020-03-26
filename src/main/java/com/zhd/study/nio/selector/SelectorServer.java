@@ -38,6 +38,8 @@ public class SelectorServer {
                 while (iterator.hasNext()) {
 
                     SelectionKey key = iterator.next();
+                    //remove
+                    iterator.remove();
                     if (key.isAcceptable()) {
                         ServerSocketChannel sscTemp = (ServerSocketChannel) key.channel();
                         //得到一个连接好的SocketChannel，并把它注册到Selector上，兴趣操作为READ
@@ -62,6 +64,20 @@ public class SelectorServer {
         }
     }
 
+    private static void writeToChannel(SocketChannel channel, String content) {
+        try {
+            buffer.clear();
+            buffer.put(content.getBytes("utf-8"));
+            buffer.flip();
+            while (buffer.hasRemaining()) {
+                channel.write(buffer);
+            }
+            buffer.clear();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static String readFromChannel(SocketChannel channel) {
         try {
             buffer.clear();
@@ -79,6 +95,7 @@ public class SelectorServer {
             }
             return stringBuffer.toString();
         } catch (IOException e) {
+            System.out.println("错误了：" + e.getMessage());
             e.printStackTrace();
         }
         return null;
