@@ -13,8 +13,8 @@ import java.util.Map;
  */
 public class CompilerTest {
     static final String JAVA_SOURCE_CODE =
-            "package com.zhd.ultimate.sociology.reflection;                   "
-                    + "import com.zhd.ultimate.sociology.proxy.UserManagerImpl;       "
+            "package com.zhd.study.reflection;                   "
+                    + "import com.zhd.study.proxy.UserManagerImpl;       "
                     + "public class UserManagerImplProxy extends UserManagerImpl {    "
                     + "    public UserManagerImplProxy() {                            "
                     + "        System.out.println(\"UserManagerImplProxy构建了\");     "
@@ -27,7 +27,7 @@ public class CompilerTest {
     public static void main(String[] args) throws Exception {
         JavaStringCompiler compiler = new JavaStringCompiler();
         Map<String, byte[]> results = compiler.compile("UserManagerImplProxy.java", JAVA_SOURCE_CODE);
-        Class<?> clazz = compiler.loadClass("com.zhd.ultimate.sociology.reflection.UserManagerImplProxy", results);
+        Class<?> clazz = compiler.loadClass("com.zhd.study.reflection.UserManagerImplProxy", results);
         // try instance:
         UserManager user = (UserManager) clazz.newInstance();
         Method doWorkMethod = clazz.getMethod("doWork2");
