@@ -57,17 +57,13 @@ public class SelectorClient {
         private static String readFromChannel(SocketChannel channel) {
             ByteBuffer buffer = ByteBuffer.allocate(1024);
             try {
-                int count;
                 StringBuffer stringBuffer = new StringBuffer();
-                while ((count = channel.read(buffer)) > 0) {
+                while (channel.read(buffer) > 0) {
                     buffer.flip();
                     byte[] bytes = new byte[buffer.remaining()];
                     buffer.get(bytes);
                     stringBuffer.append(new String(bytes, "utf-8"));
                     buffer.clear();
-                }
-                if (count < 0) {
-                    channel.close();
                 }
                 return stringBuffer.toString();
             } catch (IOException e) {
@@ -87,10 +83,7 @@ public class SelectorClient {
                 schannel.register(selector, SelectionKey.OP_CONNECT);
 
                 while (true) {
-                    int count = selector.select();
-                    if (count == 0) {
-                        continue;
-                    }
+                    selector.select();//阻塞
                     Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                     while (iterator.hasNext()) {
                         SelectionKey key = iterator.next();

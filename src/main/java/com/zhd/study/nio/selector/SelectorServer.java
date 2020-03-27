@@ -29,10 +29,7 @@ public class SelectorServer {
 
 
             while (true) {
-                int count = selector.select();//阻塞
-                if (count == 0) {
-                    continue;
-                }
+                selector.select();//阻塞
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
 
@@ -81,9 +78,8 @@ public class SelectorServer {
     private static String readFromChannel(SocketChannel channel) {
         try {
             ByteBuffer buffer = ByteBuffer.allocate(1024);
-            int count;
             StringBuffer stringBuffer = new StringBuffer();
-            while ((count = channel.read(buffer)) > 0) {
+            while (channel.read(buffer) > 0) {
                 buffer.flip();
                 byte[] bytes = new byte[buffer.remaining()];
                 buffer.get(bytes);
