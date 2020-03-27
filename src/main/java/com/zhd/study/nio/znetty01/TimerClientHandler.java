@@ -24,7 +24,8 @@ public class TimerClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String reqBody = "你好server，我是client";
-        ByteBuf rspBuf = Unpooled.buffer(reqBody.length());
+        byte[] reqBytes = reqBody.getBytes("utf-8");
+        ByteBuf rspBuf = Unpooled.buffer(reqBytes.length);
         rspBuf.writeBytes(reqBody.getBytes("utf-8"));
 
         ctx.writeAndFlush(rspBuf);

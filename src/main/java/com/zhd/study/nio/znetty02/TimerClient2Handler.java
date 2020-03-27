@@ -14,21 +14,23 @@ public class TimerClient2Handler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf rspBuf = (ByteBuf) msg;
-        byte[] rspBytes = new byte[rspBuf.readableBytes()];
-        rspBuf.readBytes(rspBytes);
-        String rspBody = new String(rspBytes, "utf-8");
+        String rspBody = (String) msg;
         System.out.println("服务端返回>>>" + rspBody);
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        for (int i = 0; i < 20; i++) {
-            String reqBody = "你好server，我是client" + i;
-            ByteBuf rspBuf = Unpooled.buffer(reqBody.length());
-            rspBuf.writeBytes(reqBody.getBytes("utf-8"));
+        try {
+            for (int i = 0; i < 20; i++) {
+                String reqBody = "你好server，我是client" + i + System.getProperty("line.separator");
+                byte[] reqBytes = reqBody.getBytes("utf-8");
+                ByteBuf rspBuf = Unpooled.buffer(reqBytes.length);
+                rspBuf.writeBytes(reqBytes);
 
-            ctx.writeAndFlush(rspBuf);
+                ctx.writeAndFlush(rspBuf);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -17,14 +17,9 @@ public class TimerServer2Handler extends ChannelHandlerAdapter {
         String reqBody = (String) msg;
         System.out.println("客户端请求:" + reqBody);
 
-        String rspBody = "你好我收到了你的请求-" + reqBody;
+        String rspBody = "你好我收到了你的请求-" + reqBody + System.getProperty("line.separator");
         ByteBuf rspBuf = Unpooled.copiedBuffer(rspBody.getBytes("utf-8"));
-        ctx.write(rspBuf);
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
+        ctx.writeAndFlush(rspBuf);
     }
 
     @Override
