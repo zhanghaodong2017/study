@@ -41,14 +41,14 @@ public class AsyncTimeClientHandler implements CompletionHandler<Void, AsyncTime
     }
 
     @Override
-    public void completed(Void result, AsyncTimeClientHandler attachment) {
+    public void completed(Void result, AsyncTimeClientHandler clientHandler) {
         try {
             byte[] reqBytes = "你好".getBytes("utf-8");
-            ByteBuffer buffer = ByteBuffer.allocate(reqBytes.length);
-            buffer.put(reqBytes);
-            buffer.flip();
+            ByteBuffer reqBuffer = ByteBuffer.allocate(reqBytes.length);
+            reqBuffer.put(reqBytes);
+            reqBuffer.flip();
 
-            socketChannel.write(buffer, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+            socketChannel.write(reqBuffer, reqBuffer, new CompletionHandler<Integer, ByteBuffer>() {
                 @Override
                 public void completed(Integer result, ByteBuffer buffer) {
 
@@ -58,11 +58,11 @@ public class AsyncTimeClientHandler implements CompletionHandler<Void, AsyncTime
                         ByteBuffer readBuffer = ByteBuffer.allocate(1024);
                         socketChannel.read(readBuffer, readBuffer, new CompletionHandler<Integer, ByteBuffer>() {
                             @Override
-                            public void completed(Integer result, ByteBuffer attachment) {
+                            public void completed(Integer result, ByteBuffer rspBuffer) {
                                 try {
-                                    attachment.flip();
-                                    byte[] rspBytes = new byte[attachment.remaining()];
-                                    attachment.get(rspBytes);
+                                    rspBuffer.flip();
+                                    byte[] rspBytes = new byte[rspBuffer.remaining()];
+                                    rspBuffer.get(rspBytes);
                                     String rspBody = new String(rspBytes, "utf-8");
                                     System.out.println("服务端返回消息：" + rspBody);
                                     countDownLatch.countDown();

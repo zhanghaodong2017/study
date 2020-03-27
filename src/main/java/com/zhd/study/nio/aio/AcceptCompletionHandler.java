@@ -12,16 +12,16 @@ import java.nio.channels.CompletionHandler;
 public class AcceptCompletionHandler implements CompletionHandler<AsynchronousSocketChannel, AsyncTimeServerHandler> {
 
     @Override
-    public void completed(AsynchronousSocketChannel result, AsyncTimeServerHandler attachment) {
-        attachment.serverSocketChannel.accept(attachment, this);
+    public void completed(AsynchronousSocketChannel result, AsyncTimeServerHandler serverHandler) {
+        serverHandler.serverSocketChannel.accept(serverHandler, this);
 
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         result.read(buffer, buffer, new ReadCompletionHandler(result));
     }
 
     @Override
-    public void failed(Throwable exc, AsyncTimeServerHandler attachment) {
+    public void failed(Throwable exc, AsyncTimeServerHandler serverHandler) {
         exc.printStackTrace();
-        attachment.countDownLatch.countDown();
+        serverHandler.countDownLatch.countDown();
     }
 }

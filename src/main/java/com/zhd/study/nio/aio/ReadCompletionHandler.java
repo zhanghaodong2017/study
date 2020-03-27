@@ -19,26 +19,26 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, ByteBuf
     }
 
     @Override
-    public void completed(Integer result, ByteBuffer attachment) {
-        attachment.flip();
-        byte[] bytes = new byte[attachment.remaining()];
-        attachment.get(bytes);
+    public void completed(Integer result, ByteBuffer buffer) {
+        buffer.flip();
+        byte[] reqBytes = new byte[buffer.remaining()];
+        buffer.get(reqBytes);
         try {
-            String req = new String(bytes, "utf-8");
-            System.out.println("客户端请求信息：" + req);
+            String reqBody = new String(reqBytes, "utf-8");
+            System.out.println("客户端请求信息：" + reqBody);
             doWrite("服务端时间-" + System.currentTimeMillis());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void doWrite(String content) {
+    private void doWrite(String rspBody) {
         try {
-            byte[] bytes = content.getBytes("utf-8");
-            ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
-            buffer.put(bytes);
-            buffer.flip();
-            asynchronousSocketChannel.write(buffer, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+            byte[] rspBytes = rspBody.getBytes("utf-8");
+            ByteBuffer rspBuffer = ByteBuffer.allocate(rspBytes.length);
+            rspBuffer.put(rspBytes);
+            rspBuffer.flip();
+            asynchronousSocketChannel.write(rspBuffer, rspBuffer, new CompletionHandler<Integer, ByteBuffer>() {
                 @Override
                 public void completed(Integer result, ByteBuffer buffer) {
                     //如果没有发送完，继续发
@@ -63,7 +63,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer, ByteBuf
     }
 
     @Override
-    public void failed(Throwable exc, ByteBuffer attachment) {
-
+    public void failed(Throwable exc, ByteBuffer buffer) {
+        exc.printStackTrace();
     }
 }
