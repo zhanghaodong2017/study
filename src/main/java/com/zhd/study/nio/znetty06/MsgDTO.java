@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.msgpack.annotation.Message;
 
 /**
  * @Auther : zhd
@@ -15,10 +16,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class MessageDTO {
+@Message
+public class MsgDTO {
     private int code;
     private String msg;
-    private Object data;
+    private String data;
 
     @Override
     public String toString() {
