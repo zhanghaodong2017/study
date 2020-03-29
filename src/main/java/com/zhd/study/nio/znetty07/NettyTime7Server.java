@@ -25,6 +25,9 @@ public class NettyTime7Server {
             serverBootstrap.group(bossGroup, workerGroup)//
                     .channel(NioServerSocketChannel.class)//
                     .option(ChannelOption.SO_BACKLOG, 100)//
+                    .option(ChannelOption.SO_SNDBUF, 32 * 1024)//设置发送缓冲的大小
+                    .option(ChannelOption.SO_RCVBUF, 32 * 1024)//设置接收缓冲区大小
+                    .option(ChannelOption.SO_KEEPALIVE, true)//保持连续
                     .handler(new LoggingHandler(LogLevel.INFO))//
                     .childHandler(new ChannelInitializer() {//
 
