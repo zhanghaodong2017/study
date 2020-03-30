@@ -40,11 +40,11 @@ public class HttpJsonServerHandler extends SimpleChannelInboundHandler<HttpJsonR
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
+
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        HttpJsonRequest jsonRequest = (HttpJsonRequest) msg;
-        HttpRequest request = jsonRequest.getRequest();
-        Map<String, String> paramsMap = jsonRequest.getParams();
+    protected void messageReceived(ChannelHandlerContext ctx, HttpJsonRequest httpJsonRequest) throws Exception {
+        HttpRequest request = httpJsonRequest.getRequest();
+        Map<String, String> paramsMap = httpJsonRequest.getParams();
         System.out.println("Http server receive request : " + paramsMap);
         RspInfo rspInfo = new RspInfo(0, "原路返回", paramsMap);
         HttpJsonResponse response = new HttpJsonResponse(null, rspInfo);
@@ -57,11 +57,6 @@ public class HttpJsonServerHandler extends SimpleChannelInboundHandler<HttpJsonR
                 }
             });
         }
-    }
-
-    @Override
-    protected void messageReceived(ChannelHandlerContext channelHandlerContext, HttpJsonRequest httpJsonRequest) throws Exception {
-
     }
 
     @Override

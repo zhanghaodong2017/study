@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<title>WebSocket Test</title>
+<script language="javascript" type="text/javascript">
+    var wsUri = "ws://127.0.0.1:8080/websocket";
+
+    function openws() {
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function (evt) {
+            onOpen(evt)
+        };
+        websocket.onclose = function (evt) {
+            onClose(evt)
+        };
+        websocket.onmessage = function (evt) {
+            onMessage(evt)
+        };
+        websocket.onerror = function (evt) {
+            onError(evt)
+        };
+    }
+
+    function closews() {
+        websocket.close();
+    }
+
+
+    function onOpen(evt) {
+        writeToScreen("CONNECTED");
+    }
+
+    function onClose(evt) {
+        writeToScreen("DISCONNECTED");
+    }
+
+    function onMessage(evt) {
+        writeToScreen('RESPONSE: ' + evt.data);
+    }
+
+    function onError(evt) {
+        writeToScreen('ERROR' + evt.data);
+    }
+
+    function sendtext() {
+        var message = document.getElementById("intext").value;
+        writeToScreen("SENT: " + message);
+        websocket.send(message);
+    }
+
+    function writeToScreen(message) {
+        var ele = document.getElementById("output");
+        ele.value = ele.value + "\n" + message;
+    }
+
+</script>
+<h2>WebSocket Test</h2>
+
+<input type="text" value="" id="intext" style="width: 500px"/>
+<br/>
+<input type="button" value="打开" onclick="openws()"/>
+<input type="button" value="发送" onclick="sendtext()"/>
+<input type="button" value="关闭" onclick="closews()"/>
+<br/>
+<textarea id="output" style="width: 500px;height: 300px">
+	
+	
+</textarea>
+
+</html>
