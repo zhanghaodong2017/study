@@ -28,6 +28,15 @@
             <artifactId>netty-resolver</artifactId>
             <version>5.0.0.Alpha2</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-transport -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>5.0.0.Alpha2</version>
+        </dependency>
+
+
         <!-- https://mvnrepository.com/artifact/org.jboss.marshalling/jboss-marshalling-serial -->
         <dependency>
             <groupId>org.jboss.marshalling</groupId>
