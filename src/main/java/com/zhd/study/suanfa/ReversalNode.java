@@ -24,7 +24,7 @@ public class ReversalNode {
             return node;
         }
         Node<Integer> temp = null;
-        Node<Integer> next = null;
+        Node<Integer> next;
         while (node != null) {
             next = node.next;
             node.next = temp;
