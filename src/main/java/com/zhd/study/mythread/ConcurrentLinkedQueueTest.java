@@ -1,8 +1,6 @@
 package com.zhd.study.mythread;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author: zhanghaodong
@@ -28,7 +26,6 @@ public class ConcurrentLinkedQueueTest {
         for (int i = 0; i < 100; i++) {
             System.out.println(linkedQueue.poll());
         }
-
 
 
     }

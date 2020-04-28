@@ -69,7 +69,7 @@ public class EightHuangHou {
                 if (result[row] == column) {
                     System.out.print("Q ");
                 } else {
-                    System.out.print("* ");
+                    System.out.print("* 988");
                 }
             }
             System.out.println();
